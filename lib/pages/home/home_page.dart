@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:youre/models/channel_models.dart';
+import 'package:youre/models/user_model.dart';
 import 'package:youre/models/video_channel.dart';
-import 'package:youre/pages/video_page/video_page.dart';
+import 'package:youre/pages/video/video_page.dart';
 import 'package:youre/services/api_services.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
-
+  final User user;
+  HomePage(this.user);
   @override
   _HomePageState createState() => _HomePageState();
 }

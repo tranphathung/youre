@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:youre/models/channel_models.dart';
 import 'package:youre/models/user_model.dart';
 import 'package:youre/models/video_channel.dart';
 import 'package:youre/pages/video/video_page.dart';
 import 'package:youre/services/api_services.dart';
+import 'package:youre/utils/constants.dart';
+import 'package:youre/widgets/bottom_navy_bar.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -15,43 +18,98 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   Channel _channel;
+  double currentPageValue = 0;
+  PageController _pageController;
+
   @override
   void initState() {
+    _pageController = PageController(initialPage: 0);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Bao Binh Tarot")),
-      body: FutureBuilder(
-        future: APIService.api_instance
-            .fetchChannel(channelId: 'UCgv7drSmFw3O9HnL4ZJ6mVw'),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null)
-            return CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-            );
-          _channel = snapshot.data;
-          return NotificationListener(
-            onNotification: (ScrollNotification scrollNotification) {
-              if (!_isLoading &&
-                  _channel.videoCount.length !=
-                      int.parse(_channel.videoCount) &&
-                  scrollNotification.metrics.pixels ==
-                      scrollNotification.metrics.maxScrollExtent)
-                _loadMoreVideos();
-            },
-            child: ListView.builder(
-              itemCount: _channel.videos.length,
-              itemBuilder: (context, index) {
-                Video video = _channel.videos[index];
-                return _buildVideo(video);
-              },
-            ),
-          );
-        },
+      body: Stack(
+        children: <Widget>[
+          PageView(
+            controller: _pageController,
+            children: <Widget>[
+              FutureBuilder(
+                future: APIService.api_instance
+                    .fetchChannel(channelId: 'UCgv7drSmFw3O9HnL4ZJ6mVw'),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.data == null)
+                    return CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                    );
+                  _channel = snapshot.data;
+                  return NotificationListener(
+                    onNotification: (ScrollNotification scrollNotification) {
+                      if (!_isLoading &&
+                          _channel.videoCount.length !=
+                              int.parse(_channel.videoCount) &&
+                          scrollNotification.metrics.pixels ==
+                              scrollNotification.metrics.maxScrollExtent)
+                        _loadMoreVideos();
+                    },
+                    child: Container(
+                      color: primaryColor,
+                      child: ListView.builder(
+                        itemCount: _channel.videos.length,
+                        itemBuilder: (context, index) {
+                          Video video = _channel.videos[index];
+                          return _buildVideo(video);
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+              Container(
+                color: primaryColor,
+                child: Center(
+                  child: Text("page 2"),
+                ),
+              ),
+              Container(
+                color: primaryColor,
+                child: Center(
+                  child: Text("page 3"),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
+      bottomNavigationBar: BottomNavyBar(
+          selectedIndex: currentPageValue.toInt(),
+          animationDuration: Duration(milliseconds: 300),
+          curve: Curves.easeInCirc,
+          backgroundColor: secondaryColor,
+          showElevation: true,
+          items: [
+            BottomNavyBarItem(
+                icon: Icon(LineIcons.home),
+                title: Text("Home"),
+                activeColor: primaryColor.withAlpha(50)),
+            BottomNavyBarItem(
+                icon: Icon(Icons.favorite_border),
+                title: Text("Like"),
+                activeColor: primaryColor.withAlpha(50)),
+            BottomNavyBarItem(
+                icon: Icon(Icons.people_outline),
+                title: Text("Channel"),
+                activeColor: primaryColor.withAlpha(50)),
+          ],
+          onItemSelected: (index) {
+            _pageController.animateToPage(index,
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInCirc);
+            setState(() {
+              currentPageValue = index.toDouble();
+            });
+          }),
     );
   }
 

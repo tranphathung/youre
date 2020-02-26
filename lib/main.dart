@@ -20,13 +20,14 @@ class MyApp extends StatelessWidget {
       create: (context) => LoginBloc(),
       child: MaterialApp(
         title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
         home: BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
             if (state is Authenticated) {
-              return HomePage((state as Authenticated).user);
+              return HomePage(state.user);
             } else {
               return LoginPage();
             }

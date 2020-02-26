@@ -21,3 +21,10 @@ const defaultTextStyle =
     TextStyle(fontFamily: "Lato", fontSize: 16.0, color: Colors.white);
 
 const defaultPadding = EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0);
+
+class YoutubeVideoConstant {
+  static const chartMostPopular = "mostPopular";
+  static const partSnippet = "snippet";
+  static const partContentDetails = "contentDetails";
+  static const partStatistics = "statistics";
+}

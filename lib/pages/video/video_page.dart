@@ -55,7 +55,8 @@ class _VideoPageState extends State<VideoPage> {
                 style: defaultTextStyle.copyWith(
                     fontWeight: FontWeight.w700, height: 1.5),
               ),
-            )
+            ),
+            
           ],
         ),
       ),

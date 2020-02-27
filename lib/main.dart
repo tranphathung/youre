@@ -25,6 +25,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<PopularBloc>(
           create: (context) =>
               PopularBloc(loginBloc: BlocProvider.of<LoginBloc>(context)),
+        ),
+        BlocProvider<ChannelBloc>(
+          create: (context) =>
+              ChannelBloc(loginBloc: BlocProvider.of<LoginBloc>(context)),
         )
       ],
       child: MaterialApp(

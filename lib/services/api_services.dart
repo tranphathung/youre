@@ -7,7 +7,6 @@ import 'package:youre/utils/key.dart';
 import 'package:http/http.dart' as http;
 
 class APIService {
-  
   APIService._();
   static final APIService api_instance = APIService._();
   final String _base_URL = 'www.googleapis.com';
@@ -19,11 +18,12 @@ class APIService {
       List<String> parts,
       String maxResults,
       bool mine: true}) async {
+        
     Map<String, String> parameters = {
       'part': parts.join(","),
       'pageToken': _subscriptionPageToken ?? '',
       "mine": mine.toString(),
-      "maxResults": maxResults,
+      "maxResults": '15',
       'key': API_KEY
     };
 
@@ -34,15 +34,23 @@ class APIService {
       HttpHeaders.authorizationHeader: 'Bearer $accessToken'
     };
 
-    var response = await http.get(uri, headers: headers);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = json.decode(response.body);
-      _subscriptionPageToken = data['nextPageToken'];
-      List<dynamic> items = data['items'];
-      return items.map((json) => Channel.fromSubscription(json)).toList();
-    } else {
-      throw json.decode(response.body)['error']['message'];
+    try {
+      var response = await http.get(uri, headers: headers);
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
+        _subscriptionPageToken = data['nextPageToken'];
+        List<dynamic> items = data['items'];
+        List<Channel> channels = List();
+        items.forEach((item) => channels.add(Channel.fromSubscription(item)));
+        return channels;
+      } else {
+        Map<String, dynamic> data = json.decode(response.body);
+        print("${response.statusCode}: ${data['error']['message']}");
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 

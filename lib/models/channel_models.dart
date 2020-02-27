@@ -24,7 +24,7 @@ class Channel {
         title: json['snippet']['title'],
         description: json['snippet']['description'],
         thumbnailUrl: json['snippet']['thumbnails']['high']['url'],
-        totalItemCount: json['contentDetails']['totalItemCount']);
+        totalItemCount: json['contentDetails']['totalItemCount'].toString());
   }
 
   @override

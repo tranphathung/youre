@@ -1,36 +1,46 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:youre/models/channel_models.dart';
 import 'package:youre/models/video.dart';
 import 'package:youre/utils/key.dart';
 import 'package:http/http.dart' as http;
 
 class APIService {
+  
   APIService._();
   static final APIService api_instance = APIService._();
   final String _base_URL = 'www.googleapis.com';
-  String _nextPageToken = '';
+  String _subscriptionPageToken = '';
   String _popularPageToken = '';
 
-  Future<Channel> fetchChannel({String channelId}) async {
+  Future<List<Channel>> fetchSubscriptionChannels(
+      {@required String accessToken,
+      List<String> parts,
+      String maxResults,
+      bool mine: true}) async {
     Map<String, String> parameters = {
-      'part': 'snippet, contentDetails, statistics',
-      'id': channelId,
+      'part': parts.join(","),
+      'pageToken': _subscriptionPageToken ?? '',
+      "mine": mine.toString(),
+      "maxResults": maxResults,
       'key': API_KEY
     };
-    Uri uri = Uri.https(_base_URL, '/youtube/v3/channels', parameters);
+
+    Uri uri = Uri.https(_base_URL, '/youtube/v3/subscriptions', parameters);
+
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $accessToken'
     };
 
     var response = await http.get(uri, headers: headers);
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> data = json.decode(response.body)['items'][0];
-      Channel channel = Channel.fromMap(data);
-      channel.videos =
-          await fetchVideosFromPlaylist(playlistId: channel.uploadPlaylistID);
-      return channel;
+      Map<String, dynamic> data = json.decode(response.body);
+      _subscriptionPageToken = data['nextPageToken'];
+      List<dynamic> items = data['items'];
+      return items.map((json) => Channel.fromSubscription(json)).toList();
     } else {
       throw json.decode(response.body)['error']['message'];
     }
@@ -75,41 +85,6 @@ class APIService {
     } catch (e) {
       print(e);
       return null;
-    }
-  }
-
-  Future<List<Video>> fetchVideosFromPlaylist({String playlistId}) async {
-    Map<String, String> parameters = {
-      'part': 'snippet',
-      'playlistId': playlistId,
-      'maxResults': '8',
-      'pageToken': _nextPageToken,
-      'key': API_KEY
-    };
-
-    Uri uri = Uri.https(_base_URL, 'youtube/v3/playlistItems', parameters);
-
-    Map<String, String> headers = {
-      HttpHeaders.contentTypeHeader: 'application/json'
-    };
-
-    try {
-      var response = await http.get(uri, headers: headers);
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        _nextPageToken = data['nextPageToken'] ?? '';
-        List<dynamic> videosJson = data['items'];
-
-        List<Video> videos = [];
-        videosJson.forEach(
-            (json) => videos.add(Video.fromMapPopular(json['snippet'])));
-
-        return videos;
-      } else {
-        return [];
-      }
-    } catch (e) {
-      throw e;
     }
   }
 }

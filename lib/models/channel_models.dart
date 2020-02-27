@@ -1,34 +1,34 @@
-
-
 import 'video.dart';
 
-class Channel{
-  final String id;
+class Channel {
   final String title;
-  final String projilePictureURL;
-  final String subscriberCount;
-  final String videoCount;
-  final String uploadPlaylistID;
+  final String id;
+  final String description;
+  final String thumbnailUrl;
+  final String totalItemCount;
   List<Video> videos;
 
-  Channel({
-    this.id,
-    this.title,
-    this.projilePictureURL,
-    this.subscriberCount,
-    this.uploadPlaylistID,
-    this.videoCount,
-    this.videos
-  });
+  Channel(
+      {this.id,
+      this.title,
+      this.description,
+      this.thumbnailUrl,
+      this.videos,
+      this.totalItemCount}) {
+    this.videos = List();
+  }
 
-  factory Channel.fromMap(Map<String, dynamic> map){
+  factory Channel.fromSubscription(Map<String, dynamic> json) {
     return Channel(
-      id: map['id'],
-      title: map['snippet']['title'],
-      projilePictureURL: map['snippet']['thumbnails']['default']['url'],
-      subscriberCount: map['statistics']['subscriberCount'],
-      videoCount: map['statistics']['videoCount'],
-      uploadPlaylistID: map['contentDetails']['relatedPlaylists']['uploads']
-    );
+        id: json['snippet']['resourceId']['channelId'],
+        title: json['snippet']['title'],
+        description: json['snippet']['description'],
+        thumbnailUrl: json['snippet']['thumbnails']['high']['url'],
+        totalItemCount: json['contentDetails']['totalItemCount']);
+  }
+
+  @override
+  String toString() {
+    return "Channel: {$id: $title}";
   }
 }

@@ -1,5 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:youre/models/user_model.dart';
+import 'package:youre/utils/key.dart';
 
 class LoginRepository {
   LoginRepository._();
@@ -7,7 +8,7 @@ class LoginRepository {
 
   loginToApp() async {
     try {
-      GoogleSignIn _googleSigin = GoogleSignIn();
+      GoogleSignIn _googleSigin = GoogleSignIn(scopes: ['email', authYoutubeScope]);
       GoogleSignInAccount _account = await _googleSigin.signIn();
       if (_account != null) {
         GoogleSignInAuthentication _auth = await _account.authentication;

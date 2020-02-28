@@ -6,6 +6,7 @@ import 'package:youre/blocs/popular_bloc/popular_events.dart';
 import 'package:youre/blocs/popular_bloc/popular_state.dart';
 import 'package:youre/models/user_model.dart';
 import 'package:youre/models/video.dart';
+import 'package:youre/pages/channel/channel_page.dart';
 import 'package:youre/pages/video/video_page.dart';
 import 'package:youre/repositories/repositories.dart';
 import 'package:youre/utils/constants.dart';
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double currentPageValue = 0;
+  double currentPageValue = 2;
   PageController _pageController;
   ScrollController _customeScrollController;
   List<Video> _videos;
@@ -28,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _videos = List();
-    _pageController = PageController(initialPage: 0);
+    _pageController = PageController(initialPage: 2);
     _customeScrollController = ScrollController();
     _customeScrollController.addListener(() async {
       if (_customeScrollController.position.pixels ==
@@ -99,12 +100,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text("page 2"),
                 ),
               ),
-              Container(
-                color: primaryColor,
-                child: Center(
-                  child: Text("page 3"),
-                ),
-              ),
+              ChannelPage(),
             ],
           ),
         ],
@@ -160,7 +156,7 @@ class _HomePageState extends State<HomePage> {
           )),
           Positioned.fill(
               child: Container(
-            decoration: BoxDecoration(color: primaryColor.withAlpha(150)),
+            decoration: BoxDecoration(color: primaryColor.withAlpha(120)),
           )),
           Positioned(
             bottom: 10.0,

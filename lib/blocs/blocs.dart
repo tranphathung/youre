@@ -1,3 +1,9 @@
 export './login_bloc/login_bloc.dart';
 export './login_bloc/login_events.dart';
 export './login_bloc/login_state.dart';
+export './popular_bloc/popular_bloc.dart';
+export './popular_bloc/popular_events.dart';
+export './popular_bloc/popular_state.dart';
+export './channel_bloc/channel_bloc.dart';
+export './channel_bloc/channel_event.dart';
+export './channel_bloc/channel_state.dart';

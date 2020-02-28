@@ -7,3 +7,6 @@ export './popular_bloc/popular_state.dart';
 export './channel_bloc/channel_bloc.dart';
 export './channel_bloc/channel_event.dart';
 export './channel_bloc/channel_state.dart';
+export './favorite_bloc/favorite_bloc.dart';
+export './favorite_bloc/favorite_event.dart';
+export './favorite_bloc/favorite_state.dart';

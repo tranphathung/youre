@@ -14,8 +14,8 @@ class ApiFavorite {
     return _apiFavorite;
   }
 
-  String _BASEURL = 'www.googleapis.com';
-  String _VIDEOSAPI = '/youtube/v3/videos';
+  static const String _BASEURL = 'www.googleapis.com';
+  static const String _VIDEOSAPI = '/youtube/v3/videos';
   String _pageToken = '';
 
   Future<List<Video>> loadFavoriteVideos(String accessToken) async {

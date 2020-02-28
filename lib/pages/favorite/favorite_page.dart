@@ -1,40 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:youre/blocs/popular_bloc/popular_bloc.dart';
-import 'package:youre/blocs/popular_bloc/popular_events.dart';
-import 'package:youre/blocs/popular_bloc/popular_state.dart';
-import 'package:youre/models/user_model.dart';
+import 'package:youre/blocs/blocs.dart';
 import 'package:youre/models/video.dart';
-import 'package:youre/pages/channel/channel_page.dart';
-import 'package:youre/pages/favorite/favorite_page.dart';
 import 'package:youre/pages/video/video_page.dart';
 import 'package:youre/utils/constants.dart';
-import 'package:youre/widgets/bottom_navy_bar.dart';
 
-class HomePage extends StatefulWidget {
-  final User user;
-  HomePage(this.user);
+class FavoritePage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _FavoritePageState createState() => _FavoritePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _FavoritePageState extends State<FavoritePage> {
   double currentPageValue = 2;
-  PageController _pageController;
   ScrollController _customeScrollController;
   List<Video> _videos;
-  PopularBloc _popBloc;
+  FavoriteBloc _favoriteBloc;
+  LoginBloc _loginBloc;
 
   @override
   void initState() {
     _videos = List();
-    _pageController = PageController(initialPage: 2);
     _customeScrollController = ScrollController();
-    _customeScrollController.addListener(() async {
+    _customeScrollController.addListener(() {
       if (_customeScrollController.position.pixels ==
           _customeScrollController.position.maxScrollExtent) {
-        await _fetchMorePopularVideos();
+        _fetchMoreFavoriteVideos();
       }
     });
   }
@@ -42,85 +33,45 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _customeScrollController.dispose();
-    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _popBloc = BlocProvider.of<PopularBloc>(context);
+    _favoriteBloc = BlocProvider.of<FavoriteBloc>(context);
+    _loginBloc = BlocProvider.of<LoginBloc>(context);
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          PageView(
-            controller: _pageController,
-            children: <Widget>[
-              BlocBuilder<PopularBloc, PopularState>(
-                builder: (context, state) {
-                  if (state is PopularLoaded) {
-                    List<Video> videos = state.videos;
-                    _videos = videos;
-                    return Container(
-                        color: primaryColor,
-                        child: ListView.builder(
-                          controller: _customeScrollController,
-                          itemCount: _videos.length,
-                          itemBuilder: (context, index) {
-                            Video video = _videos[index];
-                            return _buildVideo(video);
-                          },
-                        ));
-                  } else {
-                    return Container(
-                      color: primaryColor,
-                      child: Center(
-                        child: SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.red),
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                },
+      body: BlocBuilder<FavoriteBloc, FavoriteState>(
+        builder: (context, state) {
+          if (state is FavoriteLoaded) {
+            List<Video> videos = state.videos;
+            _videos = videos;
+            return Container(
+                color: primaryColor,
+                child: ListView.builder(
+                  controller: _customeScrollController,
+                  itemCount: _videos.length,
+                  itemBuilder: (context, index) {
+                    Video video = _videos[index];
+                    return _buildVideo(video);
+                  },
+                ));
+          } else {
+            return Container(
+              color: primaryColor,
+              child: Center(
+                child: SizedBox(
+                  width: 50.0,
+                  height: 50.0,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                ),
               ),
-              FavoritePage(),
-              ChannelPage(),
-            ],
-          ),
-        ],
+            );
+          }
+        },
       ),
-      bottomNavigationBar: BottomNavyBar(
-          selectedIndex: currentPageValue.toInt(),
-          animationDuration: Duration(milliseconds: 300),
-          curve: Curves.easeInQuad,
-          backgroundColor: secondaryColor,
-          showElevation: true,
-          items: [
-            BottomNavyBarItem(
-                icon: Icon(LineIcons.home),
-                title: Text("Popular"),
-                activeColor: primaryColor.withAlpha(50)),
-            BottomNavyBarItem(
-                icon: Icon(Icons.favorite_border),
-                title: Text("Like"),
-                activeColor: primaryColor.withAlpha(50)),
-            BottomNavyBarItem(
-                icon: Icon(Icons.people_outline),
-                title: Text("Channel"),
-                activeColor: primaryColor.withAlpha(50)),
-          ],
-          onItemSelected: (index) {
-            _pageController.animateToPage(index,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeInCirc);
-            setState(() {
-              currentPageValue = index.toDouble();
-            });
-          }),
     );
   }
 
@@ -234,7 +185,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future _fetchMorePopularVideos() async {
-    _popBloc.add(UpdatePopular(_videos));
+  _fetchMoreFavoriteVideos() async {
+    if (_loginBloc.state is Authenticated) {
+      _favoriteBloc.add(UpdateFavorite(
+          accessToken: (_loginBloc.state as Authenticated).user.accessToken,
+          videos: _videos));
+    }
   }
 }

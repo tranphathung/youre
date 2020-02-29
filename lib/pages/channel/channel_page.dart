@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youre/blocs/blocs.dart';
 import 'package:youre/models/channel_models.dart';
+import 'package:youre/pages/channel_detail/channel_detail.dart';
 import 'package:youre/utils/constants.dart';
 
 class ChannelPage extends StatefulWidget {
@@ -121,7 +122,19 @@ class _ChannelPageState extends State<ChannelPage> {
             Positioned.fill(child: Container(
               child: InkWell(
                 onTap: () {
-                  print("tap");
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                          pageBuilder: (context, ani1, ani2) => ChannelDetail(
+                                channel: channel,
+                              ),
+                          transitionDuration: Duration(milliseconds: 300),
+                          transitionsBuilder: (context, ani1, ani2, child) {
+                            return FadeTransition(
+                              opacity: ani1,
+                              child: child,
+                            );
+                          }));
                 },
               ),
             ))

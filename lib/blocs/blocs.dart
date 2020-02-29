@@ -10,3 +10,6 @@ export './channel_bloc/channel_state.dart';
 export './favorite_bloc/favorite_bloc.dart';
 export './favorite_bloc/favorite_event.dart';
 export './favorite_bloc/favorite_state.dart';
+export './channel_detail_bloc/channel_detail_bloc.dart';
+export './channel_detail_bloc/channel_detail_event.dart';
+export './channel_detail_bloc/channel_detail_state.dart';

@@ -4,21 +4,49 @@ import 'package:youre/blocs/blocs.dart';
 import 'package:youre/models/channel_models.dart';
 import 'package:youre/utils/constants.dart';
 
-class ChannelPage extends StatelessWidget {
-  const ChannelPage({Key key}) : super(key: key);
+class ChannelPage extends StatefulWidget {
+  @override
+  _ChannelPageState createState() => _ChannelPageState();
+}
+
+class _ChannelPageState extends State<ChannelPage> {
+  ScrollController _scrollController;
+  ChannelBloc _channelBloc;
+  LoginBloc _loginBloc;
+  List<Channel> _channels;
+  @override
+  void initState() {
+    _scrollController = ScrollController(initialScrollOffset: 0);
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _loadMoreChannel();
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    _channelBloc = BlocProvider.of<ChannelBloc>(context);
+    _loginBloc = BlocProvider.of<LoginBloc>(context);
     return BlocBuilder<ChannelBloc, ChannelState>(
       builder: (context, state) {
         if (state is ChannelListLoaded) {
-          List<Channel> channels = state.channels;
+          _channels = state.channels;
           return Container(
             color: primaryColor,
             child: ListView.builder(
-              itemCount: channels.length,
+              controller: _scrollController,
+              itemCount: _channels.length,
               itemBuilder: (context, index) {
-                Channel channel = channels[index];
+                Channel channel = _channels[index];
                 return _buildChannel(context, channel);
               },
             ),
@@ -27,9 +55,12 @@ class ChannelPage extends StatelessWidget {
           return Container(
             color: primaryColor,
             child: Center(
-              child: Text(
-                "loading...........",
-                style: defaultTextStyle,
+              child: SizedBox(
+                width: 50.0,
+                height: 50.0,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                ),
               ),
             ),
           );
@@ -86,10 +117,25 @@ class ChannelPage extends StatelessWidget {
                   ),
                 ),
               ),
-            )
+            ),
+            Positioned.fill(child: Container(
+              child: InkWell(
+                onTap: () {
+                  print("tap");
+                },
+              ),
+            ))
           ],
         ),
       ),
     );
+  }
+
+  void _loadMoreChannel() {
+    if (_loginBloc.state is Authenticated) {
+      _channelBloc.add(LoadUpdateListChannel(
+          channels: _channels,
+          accessToken: (_loginBloc.state as Authenticated).user.accessToken));
+    }
   }
 }

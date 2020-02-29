@@ -24,6 +24,14 @@ class Video {
         likeCount: json['statistics']['likeCount']);
   }
 
+  factory Video.fromPlaylistItem(Map<String, dynamic> json){
+    return Video(
+      id: json['contentDetails']['videoId'],
+      title: json['snippet']['title'],
+      thumbnailURL: json['snippet']['thumbnails']['high']['url'],
+      channelTitle: json['snippet']['channelTittle']
+    );
+  }
   @override
   String toString() {
     return "Video $id";
